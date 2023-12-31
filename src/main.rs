@@ -30,7 +30,7 @@ mod day_25;
 #[allow(unused)]
 mod util;
 
-const BASIC_STRING: String = String::new();
+const FILL_IN: Option<String> = None;
 
 #[allow(clippy::type_complexity)]
 const LOOKUP: [fn(&str) -> (usize, usize); 25] = [
@@ -70,7 +70,7 @@ fn main() {
 
     folder.push("day_00.txt");
 
-    let mut inputs = [BASIC_STRING; 25];
+    let mut inputs = [FILL_IN; 25];
 
     let mut input_filename = String::with_capacity(12);
 
@@ -80,15 +80,20 @@ fn main() {
 
         folder.set_file_name(&input_filename);
 
-        *input = std::fs::read_to_string(&folder).unwrap();
+        *input = std::fs::read_to_string(&folder).ok();
     }
 
     let mut total_time = Duration::new(0, 0);
 
     for (day, solution) in LOOKUP.iter().enumerate() {
+        let Some(input) = &inputs[day] else {
+            println!("Skipping day {:02}", day + 1);
+            continue;
+        };
+
         let start = std::time::Instant::now();
 
-        let (part_1, part_2) = solution(&inputs[day]);
+        let (part_1, part_2) = solution(&input);
 
         let end = std::time::Instant::now();
 
